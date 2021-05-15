@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'pages.apps.PagesConfig',
     'product.apps.ProductConfig',
     'debug_toolbar',
+    'widget_tweaks',
+    'cart.apps.CartConfig',
+
 ]
 
 MIDDLEWARE = [
