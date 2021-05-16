@@ -42,7 +42,10 @@ INSTALLED_APPS = [
     'product.apps.ProductConfig',
     'debug_toolbar',
     'widget_tweaks',
+    'localflavor',
+    'crispy_forms',
     'cart.apps.CartConfig',
+    'orders',
 
 ]
 
@@ -146,3 +149,12 @@ import socket
 
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
+
+# CartConfig
+
+CART_SESSION_ID = 'cart'
+CART_ITEM_MAX_QUANTITY = 20
+
+#Crispy
+
+CRISPY_TEMPLATE_PACK ='bootstrap4'

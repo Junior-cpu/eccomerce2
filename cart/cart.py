@@ -2,13 +2,14 @@ from decimal import Decimal
 from product.models import Product
 import copy
 from .forms import CartAddProductForm
+from django.conf import settings
 
 class Cart:
     def __init__(self,request):
-        if request.session.get('cart') is None:
-            request.session['cart'] = {}
+        if request.session.get(settings.CART_SESSION_ID) is None:
+            request.session[settings.CART_SESSION_ID] = {}
             
-        self.cart = request.session['cart']
+        self.cart = request.session[settings.CART_SESSION_ID]
         self.session = request.session
     
     def __iter__(self):
@@ -45,6 +46,9 @@ class Cart:
             self.cart[product_id]["quantity"] = quantity
         else:             
             self.cart[product_id]['quantity'] += quantity
+            
+        self.cart[product_id]['quantity'] = min(20,self.cart[product_id]['quantity'])
+            
         self.session.modified = True     
         
     def remove(self,product):
@@ -58,6 +62,9 @@ class Cart:
     def get_total_price(self):
         return sum(item['quantity'] * Decimal(item['price']) for item in self.cart.values())   
     
+    def clear(self):
+        del self.session[settings.CART_SESSION_ID]
+        self.save()
     
     def save(self):
        self.session.modified = True    

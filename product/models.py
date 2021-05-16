@@ -22,16 +22,16 @@ class Category(TimeStampedModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("products:list_by_category", kwargs={"slug": self.slug})
+        return reverse("product:list_by_category", kwargs={"slug": self.slug})
 
 
 class Product(TimeStampedModel):
     category = models.ForeignKey(
-        Category, related_name="products", on_delete=models.CASCADE
+        Category, related_name="product", on_delete=models.CASCADE
     )
     name = models.CharField(max_length=255)
     slug = AutoSlugField(unique=True, always_update=False, populate_from="name")
-    image = models.ImageField(upload_to="products/%Y/%m/%d", blank=True)
+    image = models.ImageField(upload_to="product/%Y/%m/%d", blank=True)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     is_available = models.BooleanField(default=True)
@@ -46,5 +46,5 @@ class Product(TimeStampedModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("products:detail", kwargs={"slug": self.slug})
+        return reverse("product:detail", kwargs={"slug": self.slug})
 

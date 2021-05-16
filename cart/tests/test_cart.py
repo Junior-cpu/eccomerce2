@@ -2,8 +2,8 @@ import pytest
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpRequest
-
 from product.tests.factories import ProductFactory
+from django.conf import settings
 
 from ..cart import Cart
 
@@ -35,21 +35,21 @@ def cart(http_request, session):
 
 
 def test_create_empty_cart(http_request, session):
-    assert session.get('cart') is None
+    assert session.get(settings.CART_SESSION_ID) is None
     Cart(http_request)
-    assert session['cart'] == {}
+    assert session[settings.CART_SESSION_ID] == {}
 
 
 def test_get_non_empty_cart(http_request, session):
-    session['cart'] = {"1": {}}
+    session[settings.CART_SESSION_ID] = {"1": {}}
     Cart(http_request)
-    assert session['cart'] == {"1": {}}
+    assert session[settings.CART_SESSION_ID] == {"1": {}}
 
 
 def test_add_product_to_empty_cart(product, cart, session):
     cart.add(product)
 
-    assert session['cart'] == {
+    assert session[settings.CART_SESSION_ID] == {
         str(product.id): {"quantity": 1, "price": str(product.price)}
     }
     assert session.modified
@@ -58,7 +58,7 @@ def test_add_product_to_empty_cart(product, cart, session):
 def test_add_product_to_empty_cart_quantity_gt_1(product, cart, session):
     cart.add(product, 2)
 
-    assert session['cart'] == {
+    assert session[settings.CART_SESSION_ID] == {
         str(product.id): {"quantity": 2, "price": str(product.price)}
     }
     assert session.modified
@@ -70,7 +70,7 @@ def test_add_product_to_empty_cart_twice(product, cart, session):
 
     cart.add(product, 2)
 
-    assert session['cart'] == {
+    assert session[settings.CART_SESSION_ID] == {
         str(product.id): {"quantity": 3, "price": str(product.price)}
     }
     assert session.modified
@@ -82,7 +82,7 @@ def test_add_product_to_empty_cart_override_quantity(product, cart, session):
 
     cart.add(product, 4, override_quantity=True)
 
-    assert session['cart'] == {
+    assert session[settings.CART_SESSION_ID] == {
         str(product.id): {"quantity": 4, "price": str(product.price)}
     }
     assert session.modified
@@ -93,13 +93,13 @@ def test_remove_product(product, cart, session):
     session.modified = False
 
     cart.remove(product)
-    assert session['cart'] == {}
+    assert session[settings.CART_SESSION_ID] == {}
     assert session.modified
 
 
 def test_remove_product_not_in_cart(product, cart, session):
     cart.remove(product)
-    assert session['cart'] == {}
+    assert session[settings.CART_SESSION_ID] == {}
     assert not session.modified
 
 
@@ -150,3 +150,23 @@ def test_get_total_price(cart):
     total_price = (p1.price * 1) + (p2.price * 2)
 
     assert cart.get_total_price() == total_price
+
+def test_cant_add_more_max_items(product,cart):
+    cart.add(product,settings.CART_ITEM_MAX_QUANTITY)
+    assert len(cart) == settings.CART_ITEM_MAX_QUANTITY
+    
+    cart.add(product,1)
+    assert len(cart) == settings.CART_ITEM_MAX_QUANTITY
+    
+    def test_cant_add_more_than_max_items(product, cart):
+        cart.add(product, settings.CART_ITEM_MAX_QUANTITY)
+    assert len(cart) == settings.CART_ITEM_MAX_QUANTITY
+
+    cart.add(product, 1)
+    assert len(cart) == settings.CART_ITEM_MAX_QUANTITY
+
+
+#def test_clear_cart(cart, session):
+ #   assert settings.CART_SESSION_ID in session
+  #  cart.clear()
+   # assert settings.CART_SESSION_ID not in session
