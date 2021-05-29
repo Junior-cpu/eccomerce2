@@ -32,4 +32,3 @@ class OrderCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context["cart"] = Cart(self.request)
         return context
-

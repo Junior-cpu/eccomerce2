@@ -166,7 +166,7 @@ def test_cant_add_more_max_items(product,cart):
     assert len(cart) == settings.CART_ITEM_MAX_QUANTITY
 
 
-#def test_clear_cart(cart, session):
- #   assert settings.CART_SESSION_ID in session
-  #  cart.clear()
-   # assert settings.CART_SESSION_ID not in session
+def test_clear_cart(cart, session):
+    assert settings.CART_SESSION_ID in session
+    cart.clear()
+    assert settings.CART_SESSION_ID not in session
